@@ -1,21 +1,20 @@
-sudo: required
 dist: trusty
-
+sudo: required
 language: node_js
 node_js:
-  - '4.5'
-
-install:
-  - export DISPLAY=:99.0
-  - sh -e /etc/init.d/xvfb start
-  - wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-  - sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
-  - sudo apt-get update -q
-  - sudo apt-get install -q google-chrome-stable
-
+  - "5"
+os:
+  - linux
+env:
+  global:
+    - DBUS_SESSION_BUS_ADDRESS=/dev/null
+    - DISPLAY=:99.0
+    - CHROME_BIN=chromium-browser
 before_script:
+  - sh -e /etc/init.d/xvfb start
+install:
   - npm install
-
 script:
-  - npm run test-single-run
-  - (npm start > /dev/null &) && (npm run protractor)
+  - npm run lint
+  - npm run test:once
+  - npm run e2e
