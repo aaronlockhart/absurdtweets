@@ -34,7 +34,7 @@ export class Server {
      * Handles requests to /test
      */
     public routeTestHandler(req: express.Request, res: express.Response) {
-        this.twitter.getLatestTweet('@realDonaldTrump').then((tweet) => {
+        this.twitter.getLatestTweetsByCount('@realDonaldTrump', '3').then((tweet) => {
             res.send(tweet);
         });
     }
