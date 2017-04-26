@@ -18,6 +18,17 @@ export class MashTweetsComponent implements OnInit {
     }
 
     mash(): void {
+
+        let atIndex: number = this.twitter_user1.indexOf('@');
+        if(atIndex >= 0) {
+          this.twitter_user1.replace('@', '');
+        }
+
+        atIndex = this.twitter_user2.indexOf('@');
+        if(atIndex >= 0) {
+          this.twitter_user2.replace('@', '');
+        }
+
         // Call the function that takes the two handles and generates the mash
         this.http.get('/api/mash/:'.concat(this.twitter_user1.concat(':'.concat(this.twitter_user2)))).subscribe((response) => {
             this.tweet = response.text();
