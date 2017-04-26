@@ -19,7 +19,7 @@ export class TwitterApp {
     }
 
     // We can only retrieve the latest 3200 tweets from the timeline
-    getLatestTweetsByCount(username: string, count: string): Promise<string[]> {
+    getLatestTweetsByCount(username: string, count: string | number): Promise<string[]> {
 
         return new Promise<string[]>((resolve, reject) => {
             this.twitter.getUserTimeline({screen_name: username, count: count},
