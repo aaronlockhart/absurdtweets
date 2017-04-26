@@ -29,7 +29,34 @@ export class TwitterApp {
         console.log('ERROR [%s]', error);
     }
 
-    success(data): void {
-        console.log('Data [%s]', data);
+    success = (data) => {
+        
+        let tweets: string[] = new Array();
+        let i: number;
+        let obj = JSON.parse(data) as [any];
+
+        for(let item of obj) {
+            let tweet = this.removeLinks(item.text);
+            tweets.push(tweet);
+            console.log('Tweet [%s]', tweet);
+        }
+    }
+
+    // getOnlyTheTweet(data): string {
+        
+    //     //let obj = JSON.parse(data);
+    //     //let item = obj[0];
+    //     //let obj1 = JSON.parse(item);
+    //     return 
+    // }
+
+    removeLinks(tweet: string): string {
+
+        let index = tweet.indexOf('http');
+
+        if(index >= 0) {
+             return tweet.substring(0, index);
+        }
+        return tweet;
     }
 }
