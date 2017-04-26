@@ -10,7 +10,7 @@ export class MashTweetsComponent implements OnInit {
 
     twitter_user1: string;
     twitter_user2: string;
-    tweet: string;
+    tweet: string = '';
 
     constructor(private http: Http) { }
 

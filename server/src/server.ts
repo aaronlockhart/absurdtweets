@@ -20,7 +20,8 @@ export class Server {
 
     public api() {
         this.app.get('/api/test', this.apiGetTestHandler);
-        this.app.get('/api/corpus', this.apiGetCorpusHandler)
+        this.app.get('/api/corpus', this.apiGetCorpusHandler);
+        this.app.get('/api/mash/:twitter_handle1/:twitter_handle2', this.apiMashTheTweets );
     }
 
     public config() {
@@ -29,7 +30,6 @@ export class Server {
 
     public routes() {
         this.app.use(express.static('../client/dist'));
-        this.app.get('/api/mash/:twitter_handle1:twitter_handle2', (req, res) => this.MashTheTweets )
     }
 
     /**
@@ -41,7 +41,7 @@ export class Server {
         });
     }
 
-    public MashTheTweets(req: express.Request, res: express.Response) {
+    public apiMashTheTweets(req: express.Request, res: express.Response) {
         let twitter_handle1: string = req.param('twitter_handle1');
         let twitter_handle2: string = req.param('twitter_handle2');
         res.send(twitter_handle1.concat(
