@@ -23,6 +23,6 @@ export class Server {
     }
 
     public routes() {
-
+        this.app.use(express.static('client'));
     }
 }
