@@ -42,11 +42,12 @@ export class TwitterApp {
 
     removeUselessThings(tweet: string): string {
         let cleanedTweet: string = this.removeStringOccurances(tweet, "@");
+        cleanedTweet = this.removeStringOccurances(cleanedTweet, "[\\n\\t]");
         return this.removeStringOccurances(cleanedTweet, "http");   
     }
 
     removeStringOccurances(tweet: string, pattern: string): string {
-        let finalTweet: string = '';
+
         let regex = new RegExp(pattern,'gi');
         let result, indices:number[] = [];
         while ( (result = regex.exec(tweet)) ) {
@@ -55,7 +56,7 @@ export class TwitterApp {
 
         // Go to each index and find the next index of whitespace
         let indexWS: number = 0;
-        let stringToRemove: string;
+        let finalTweet: string = '';
         for (let index of indices)
         {
             finalTweet = finalTweet.concat(tweet.substring(indexWS, index));
