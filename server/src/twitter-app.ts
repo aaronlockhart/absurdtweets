@@ -42,14 +42,6 @@ export class TwitterApp {
         }
     }
 
-    // getOnlyTheTweet(data): string {
-        
-    //     //let obj = JSON.parse(data);
-    //     //let item = obj[0];
-    //     //let obj1 = JSON.parse(item);
-    //     return 
-    // }
-
     removeLinks(tweet: string): string {
 
         let index = tweet.indexOf('http');
