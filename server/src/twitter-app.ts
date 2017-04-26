@@ -15,9 +15,7 @@ export class TwitterApp {
                                     callbackUrl: '' });
     }
     getLatestTweet(username: string): Promise<string[]> {
-        return this.getLatestTweetsByCount(username, '1')
-               .toPromise()
-               .then(response => response as string[]);
+        return this.getLatestTweetsByCount(username, '1');
     }
 
     // We can only retrieve the latest 3200 tweets from the timeline
