@@ -26,14 +26,14 @@ export class Server {
     }
 
     public routes() {
-        this.app.use(express.static('client'));
-        this.app.get('/test', this.routeTestHandler);
+        this.app.use(express.static('../../client/dist'));
+        this.app.get('/test', (req, res) => this.routeTestHandler(req, res));
     }
 
     /**
      * Handles requests to /test
      */
-    private routeTestHandler(req: express.Request, res: express.Response) {
+    public routeTestHandler(req: express.Request, res: express.Response) {
         this.twitter.getLatestTweet('@realDonaldTrump').then((tweet) => {
             res.send(tweet);
         });
