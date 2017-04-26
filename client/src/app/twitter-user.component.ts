@@ -10,4 +10,9 @@ export class twitterUser {
     twitter_user1_name: string;
     twitter_user2_name: string;
 
+    mash(): void {
+        // Call the function that takes the two handles and generates the mash
+        
+    }
+
 }
