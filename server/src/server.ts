@@ -27,7 +27,7 @@ export class Server {
 
     public routes() {
         this.app.use(express.static('../client/dist'));
-        this.app.get('/test', (req, res) => this.routeTestHandler(req, res));
+        this.app.get('/api/test', (req, res) => this.routeTestHandler(req, res));
     }
 
     /**
