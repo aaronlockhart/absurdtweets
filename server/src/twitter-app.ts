@@ -14,8 +14,13 @@ export class TwitterApp {
                                     accessToken: this.accessToken, accessTokenSecret: this.accessSecret,
                                     callbackUrl: '' });
     }
-    getLatestTweet(username: string): Promise<string> {
-        return this.twitter.getUserTimeline({screen_name: username, count: '1'}, this.error, this.success)
+    getLatestTweet(username: string): Promise<string[]> {
+        return this.getLatestTweetsByCount(username, '1');
+    }
+
+    // We can only retrieve the latest 3200 tweets from the timeline
+    getLatestTweetsByCount(username: string, count: string): Promise<string[]> {
+        return this.twitter.getUserTimeline({screen_name: username, count: count}, this.error, this.success)
                .toPromise()
                .then(response => response as string);
     }
