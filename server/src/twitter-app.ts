@@ -1,4 +1,4 @@
-import * as twitterClient from 'twitter-node-client';
+import { Twitter } from 'twitter-node-client';
 import 'rxjs/add/operator/toPromise';
 
 export class TwitterApp {
@@ -10,9 +10,19 @@ export class TwitterApp {
     private twitter;
     
     constructor() {
-        this.twitter = new twitterClient.Twitter();    
+        this.twitter = new Twitter({consumerKey: this.apiKey, consumerSecret: this.apiSecret,
+                                    accessToken: this.accessToken, accessTokenSecret: this.accessSecret,
+                                    callbackUrl: '' });
     }
     getLatestTweet(username: string): Promise<string> {
+        this.twitter.getUserTimeline({screen_name: username, count: '1'}, error, success);
+    }
 
+    error(error, response, body): void {
+        console.log('ERROR [%s]', error);
+    }
+
+    success(data): void {
+        console.log('Data [%s]', data);
     }
 }
