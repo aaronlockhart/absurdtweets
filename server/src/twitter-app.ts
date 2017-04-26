@@ -31,7 +31,7 @@ export class TwitterApp {
                 let obj = JSON.parse(data) as [any];
 
                 for(let item of obj) {
-                    let tweet = this.removeLinks(item.text);
+                    let tweet = this.removeUselessThings(item.text);
                     tweets.push(tweet);
                     console.log('Tweet [%s]', tweet);
                 }
@@ -40,13 +40,28 @@ export class TwitterApp {
         });
     }
 
-    removeLinks(tweet: string): string {
+    removeUselessThings(tweet: string): string {
 
-        let index = tweet.indexOf('http');
-
-        if(index >= 0) {
-             return tweet.substring(0, index);
+        let finalTweet: string = '';
+        let regex = new RegExp("@",'gi');
+        let result, indices:number[] = [];
+        while ( (result = regex.exec(tweet)) ) {
+            indices.push(result.index);
         }
-        return tweet;
+
+        // Go to each index and find the next index of whitespace
+        let indexWS: number = 0;
+        let stringToRemove: string;
+        for (let index of indices)
+        {
+            finalTweet = finalTweet.concat(tweet.substring(indexWS, index));
+            indexWS = tweet.indexOf(' ', index);
+        }
+        // Was there an orhphaned indexWS left? Lets fix that
+        if(indexWS >= 0) {
+            finalTweet = finalTweet.concat(tweet.substring(indexWS));
+        }
+
+        return finalTweet;
     }
 }
