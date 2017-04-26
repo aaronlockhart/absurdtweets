@@ -15,7 +15,9 @@ export class TwitterApp {
                                     callbackUrl: '' });
     }
     getLatestTweet(username: string): Promise<string> {
-        this.twitter.getUserTimeline({screen_name: username, count: '1'}, error, success);
+        return this.twitter.getUserTimeline({screen_name: username, count: '1'}, error, success)
+               .toPromise()
+               .then(response => response as string);
     }
 
     error(error, response, body): void {
