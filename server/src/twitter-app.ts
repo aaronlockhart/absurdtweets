@@ -41,9 +41,13 @@ export class TwitterApp {
     }
 
     removeUselessThings(tweet: string): string {
+        let cleanedTweet: string = this.removeStringOccurances(tweet, "@");
+        return this.removeStringOccurances(cleanedTweet, "http");   
+    }
 
+    removeStringOccurances(tweet: string, pattern: string): string {
         let finalTweet: string = '';
-        let regex = new RegExp("@",'gi');
+        let regex = new RegExp(pattern,'gi');
         let result, indices:number[] = [];
         while ( (result = regex.exec(tweet)) ) {
             indices.push(result.index);
