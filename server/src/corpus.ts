@@ -21,10 +21,37 @@ export class Corpus {
 
     private processRawData = (data: string[]) => {
 
+        let brokenTweetByPeriod: string[] = new Array();
+        let brokenTweetByExclamation: string[] = new Array();
+        let brokenTweetByQuestion: string[] = new Array();
+        let tempSentence: string = '';
+
+        let lowerCase: string = '';
         let newData: string[] = new Array();
 
         data.forEach((element) => {
-            newData = newData.concat(element.toLowerCase().split('[.?!]'));
+
+            brokenTweetByPeriod = new Array();
+            brokenTweetByExclamation = new Array();
+            brokenTweetByQuestion = new Array();
+
+            lowerCase = element.toLowerCase();
+            brokenTweetByPeriod = lowerCase.split('.');
+            
+            brokenTweetByPeriod.forEach((item) => {
+                tempSentence = item.concat('.');
+                brokenTweetByExclamation = brokenTweetByExclamation.concat(tempSentence.split('!'));
+            });
+
+            brokenTweetByExclamation.forEach((item) => {
+                tempSentence = item.concat('!');
+                brokenTweetByQuestion = brokenTweetByQuestion.concat(tempSentence.split('?'));
+            });
+
+            brokenTweetByQuestion.forEach((item) => {
+                tempSentence = item.concat('?');
+                newData = newData.concat(tempSentence);
+            });
         });
 
         this.data = newData;

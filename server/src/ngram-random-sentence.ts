@@ -12,6 +12,16 @@ export class NGramRandomSentence {
     }
 
     public getRandomSentence(desiredLength: number): string {
-        return snm.generateSentence(this.model, desiredLength);
+
+        let generatedSentence: string = snm.generateSentence(this.model, desiredLength);
+
+        // Find the last punctuation (., ! or ?)
+        let lastIndexOfPeriod = generatedSentence.lastIndexOf('.');
+        let lastIndexOfExclamation = generatedSentence.lastIndexOf('!');
+        let lastIndexOfQuestion = generatedSentence.lastIndexOf('?');
+
+        let lastIndexOfPunctuation = Math.max(lastIndexOfPeriod, lastIndexOfExclamation, lastIndexOfQuestion);
+
+        return generatedSentence.substring(0, lastIndexOfPunctuation+1);
     }
 }
