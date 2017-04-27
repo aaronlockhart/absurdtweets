@@ -8,11 +8,35 @@ export class TwitterApp {
     private accessToken = '230759937-5N5BIc8E2gXmFBYqT1O0tNnrpbuLPEzYt5Sf4nyh';
     private accessSecret = '5UARfOVoRHyOuQzGCfAmGntScDbuV3fWVsFelug19g7dv';
     private twitter;
+    private tweetMap: Map<string, Array<string>>;
+    private tweetMaxIDMap: Map<string, number>;
     
     constructor() {
         this.twitter = new Twitter({consumerKey: this.apiKey, consumerSecret: this.apiSecret,
                                     accessToken: this.accessToken, accessTokenSecret: this.accessSecret,
                                     callbackUrl: '' });
+        this.tweetMap = new Map();
+        this.tweetMaxIDMap = new Map();                                    
+    }
+
+    updateTweetMap(username: string, tweet: string, tweetID: number): void {
+
+        let tweets: string[];
+        let currentMaxID: number;
+
+        if(this.tweetMap.has(username)) {
+            tweets = this.tweetMap.get(username);
+            tweets.push(tweet);
+            this.tweetMap.set(username, tweets);
+            currentMaxID = this.tweetMaxIDMap.get(username);
+            if(currentMaxID < tweetID) {
+                this.tweetMaxIDMap.set(username, tweetID);
+            }
+        }
+        else {
+            this.tweetMap.set(username, new Array(tweet));
+            this.tweetMaxIDMap.set(username, tweetID);
+        }
     }
 
     getLatestTweet(username: string): Promise<string[]> {
@@ -38,14 +62,26 @@ export class TwitterApp {
         })
     }
 
-    // We can only retrieve the latest 3200 tweets from the timeline
-    getLatestTweetsByCount(username: string, count: string | number): Promise<string[]> {
+    // This function will cache the max number of tweets allowed (3200) since the specified ID
+    // and also cache them in the map
+    // Function returns the current maxID
+    cacheTweets(username: string, sinceID: number): number {
+        let maxRequests: number = 1500;
+        let requestCount: number = 0;
+        let moreTweets: Boolean = true;
+        let maxID: number = 0;
+        let mySinceID: number = 0;
+        
+        if(sinceID) {
+            mySinceID = sinceID;
+        }
 
-        //TO-DO: Need to add caching here
-
-        return new Promise<string[]>((resolve, reject) => {
-            this.twitter.getUserTimeline({screen_name: username, count: count},
-            (error, response, body) => reject(error),
+        do {
+            if(maxID > mySinceID) {
+                mySinceID = maxID;
+            }
+            this.twitter.getUserTimeline({screen_name: username, since_id: mySinceID},
+            (error, response, body) => {},
             (data) => {
         
                 let tweets: string[] = new Array();
@@ -55,7 +91,56 @@ export class TwitterApp {
                 for(let item of obj) {
                     let tweet = this.removeUselessThings(item.text);
                     tweets.push(tweet);
-                    console.log('Tweet [%s]', tweet);
+                    let tweetID = item.id;
+                    if(tweetID > maxID) {
+                        maxID = tweetID;
+                    }
+                    i++;
+                }
+                if(i == 0) {
+                    moreTweets = false;
+                }
+                else {
+                    if(this.tweetMap.has(username)) {
+                        let oldTweets: string[] = this.tweetMap.get(username);
+                        let newTweets: string[] = oldTweets.concat(tweets);
+                        this.tweetMap.set(username, newTweets);
+                    }
+                    else {
+                        this.tweetMap.set(username, tweets);
+                    }
+                    this.tweetMaxIDMap.set(username, maxID);
+                }
+                //resolve(tweets);
+            });
+
+            requestCount++;
+            if(requestCount >= maxRequests) {
+                moreTweets = false;
+            }
+
+        }while(moreTweets);
+
+        return maxID;
+    }
+
+
+    // We can only retrieve the latest 3200 tweets from the timeline
+    getLatestTweetsByCount(username: string, count: string | number): Promise<string[]> {
+
+        return new Promise<string[]>((resolve, reject) => {
+            
+            this.twitter.getUserTimeline({screen_name: username, count: count},
+            (error, response, body) => reject(error),
+            (data) => {
+        
+                let tweets: string[] = new Array();
+                let obj = JSON.parse(data) as [any];
+
+                for(let item of obj) {
+                    let tweet = this.removeUselessThings(item.text);
+                    tweets.push(tweet);
+                    //console.log('Tweet [%s]', tweet);
                 }
                 resolve(tweets);
             })
