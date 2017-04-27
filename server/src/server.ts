@@ -24,6 +24,7 @@ export class Server {
         this.app.get('/api/corpus/:twitter_handle1/:twitter_handle2/:max_tweets', this.apiGetCorpusHandler);
         this.app.get('/api/corpus/:twitter_handle1/:twitter_handle2', this.apiGetCorpusHandler);
         this.app.get('/api/mash/:twitter_handle1/:twitter_handle2', this.apiGetMashHandler );
+        this.app.get('/api/tweets/:twitter_handle/:count', this.apiGetTweetsHandler);
         this.app.get('/api/verify/:twitter_handle', this.apiGetVerifyHandler );
     }
 
@@ -39,11 +40,17 @@ export class Server {
      * Handles get requests to /api/test
      */
     public apiGetTestHandler = (req: express.Request, res: express.Response) => {
-        this.twitter.getLatestTweetsByCount('@realDonaldTrump', '3').then((tweet) => {
+        this.twitter.getTweets('@realDonaldTrump', 3).then((tweet) => {
             res.send(tweet);
         });
     }
 
+    public apiGetTweetsHandler = (req: express.Request, res: express.Response) => {
+        let user = req.params['twitter_handle'];
+        let count = req.params['count'];
+        this.twitter.getTweets(user, count)
+        .then(tweets => res.send(tweets));
+    }
     /**
      * Handles get requests to /api/verify
      */
