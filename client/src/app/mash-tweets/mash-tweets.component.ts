@@ -34,7 +34,7 @@ export class MashTweetsComponent implements OnInit {
         }
 
         // Call the function that takes the two handles and generates the mash
-        this.http.get('/api/mash/:'.concat(user1.concat('/:'.concat(user2)))).subscribe((response) => {
+        this.http.get('/api/mash/'.concat(user1.concat('/'.concat(user2)))).subscribe((response) => {
             this.tweet = response.text();
         });
     }
