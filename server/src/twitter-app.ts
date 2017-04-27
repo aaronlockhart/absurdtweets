@@ -1,6 +1,12 @@
 import { Twitter } from 'twitter-node-client';
 import 'rxjs/add/operator/toPromise';
 
+export interface Tweets {
+    screen_name: string;
+    text: string[];
+    max_id: number;
+}
+
 export class TwitterApp {
 
     private apiKey = 'oaKzxL5dP8xDL6cxtbm6Tsw70';
@@ -10,6 +16,7 @@ export class TwitterApp {
     private twitter;
     private tweetMap: Map<string, Array<string>>;
     private tweetMaxIDMap: Map<string, number>;
+    static readonly maxTweetsPerTimelineRequest = 200;
     
     constructor() {
         this.twitter = new Twitter({consumerKey: this.apiKey, consumerSecret: this.apiSecret,
@@ -39,11 +46,49 @@ export class TwitterApp {
         }
     }
 
-    getLatestTweet(username: string): Promise<string[]> {
-        return this.getLatestTweetsByCount(username, '1');
+    public getLatestTweet(username: string): Promise<string[]> {
+        return new Promise<string[]>((resolve, reject) => {
+            this.getLatestTweetsByCount(username, '1')
+            .then((tweets) => resolve(tweets.text))
+            .catch(reason => reject(reason));
+        });
     }
 
-    verifyUserExists(username: string): Promise<boolean> {
+    /**
+     * Gets a given number of tweets for a specific user
+     * @param username The username to retrieve tweets for.
+     * @param count The total number of tweets to retrieve.
+     */
+    public getTweets(username: string, count: number): Promise<string[]> {
+        return new Promise<string[]>((resolve, reject) => {
+            let results: string[] = [];
+            let remaining = count; 
+            let nextCount = remaining >= TwitterApp.maxTweetsPerTimelineRequest ? TwitterApp.maxTweetsPerTimelineRequest : remaining; 
+            let lastPromise: Promise<Tweets> = this.getLatestTweetsByCount(username, nextCount);
+            remaining -= nextCount;
+
+            while (remaining > 0)
+            {
+                nextCount = remaining >= TwitterApp.maxTweetsPerTimelineRequest ? TwitterApp.maxTweetsPerTimelineRequest : remaining; 
+
+                lastPromise.then(tweets => {
+                    results = results.concat(tweets.text);
+                    lastPromise = this.getLatestTweetsByCount(username, nextCount, tweets.max_id);
+                })
+                .catch(reason => reject(reason));
+
+                remaining -= nextCount;
+            }
+
+            lastPromise.then(tweets => {
+                results = results.concat(tweets.text);
+                resolve(results);
+            })
+            .catch(reason => reject(reason));
+        });
+    }
+
+    public verifyUserExists(username: string): Promise<boolean> {
         
         return new Promise<boolean>((resolve, reject) => {
             //this.twitter.getUser({screen_name: username},
@@ -118,34 +163,38 @@ export class TwitterApp {
 
 
     // We can only retrieve the latest 3200 tweets from the timeline
-    getLatestTweetsByCount(username: string, count: string | number): Promise<string[]> {
+    getLatestTweetsByCount(username: string, count: string | number, maxId?: number): Promise<Tweets> {
+        
+        return new Promise<Tweets>((resolve, reject) => {
 
-        return new Promise<string[]>((resolve, reject) => {
-            
-            this.twitter.getUserTimeline({screen_name: username, count: count},
+            this.twitter.getUserTimeline({screen_name: username, count: count, max_id: maxId},
             (error, response, body) => reject(error),
             (data) => {
         
                 let tweets: string[] = new Array();
-                let obj = JSON.parse(data) as [any];
-
+                let obj = JSON.parse(data) as [{id: number, text: string}];
+                let max_id = 0;
                 for(let item of obj) {
+                    if (item.id > max_id) {
+                        max_id = item.id;
+                    }
+
                     let tweet = this.removeUselessThings(item.text);
                     tweets.push(tweet);
                     //console.log('Tweet [%s]', tweet);
                 }
-                resolve(tweets);
+                resolve({screen_name: username, max_id: max_id, text: tweets});
             })
         });
     }
 
-    removeUselessThings(tweet: string): string {
+    private removeUselessThings(tweet: string): string {
         let cleanedTweet: string = this.removeStringOccurances(tweet, "@");
         cleanedTweet = this.removeStringOccurances(cleanedTweet, "[\\n\\t]");
         return this.removeStringOccurances(cleanedTweet, "http");   
     }
 
-    removeStringOccurances(tweet: string, pattern: string): string {
+    private removeStringOccurances(tweet: string, pattern: string): string {
 
         let regex = new RegExp(pattern,'gi');
         let result, indices:number[] = [];
