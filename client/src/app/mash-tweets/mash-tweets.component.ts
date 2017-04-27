@@ -20,8 +20,8 @@ export class MashTweetsComponent implements OnInit {
 
     mash(): void {
 
-        let user1: string = '';
-        let user2: string = '';
+        let user1: string = this.twitter_user1;
+        let user2: string = this.twitter_user2;
 
         let atIndex: number = this.twitter_user1.indexOf('@');
         if(atIndex >= 0) {
@@ -34,7 +34,7 @@ export class MashTweetsComponent implements OnInit {
         }
 
         // Call the function that takes the two handles and generates the mash
-        this.http.get('/api/mash/:'.concat(user1.concat(':'.concat(user2)))).subscribe((response) => {
+        this.http.get('/api/mash/:'.concat(user1.concat('/:'.concat(user2)))).subscribe((response) => {
             this.tweet = response.text();
         });
     }
