@@ -16,6 +16,7 @@
   "dependencies": {
     "express": "^4.15.2",
     "rxjs": "^5.3.0",
+    "simple-ngram-markov": "^1.0.4",
     "twitter-node-client": "0.0.6"
   },
   "devDependencies": {
