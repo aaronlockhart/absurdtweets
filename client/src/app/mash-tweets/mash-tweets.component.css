@@ -27,3 +27,13 @@ button:disabled {
   color: #ccc; 
   cursor: auto;
 }
+h1 {
+  font-family: 'consolas';
+  font-size: 2em;
+}
+div {
+  height: 2em;
+  font-family: 'consolas';
+  font-size: 1em;
+  padding-left: .4em;
+}
