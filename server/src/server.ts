@@ -24,6 +24,7 @@ export class Server {
         this.app.get('/api/corpus/:twitter_handle1/:twitter_handle2/:max_tweets', this.apiGetCorpusHandler);
         this.app.get('/api/corpus/:twitter_handle1/:twitter_handle2', this.apiGetCorpusHandler);
         this.app.get('/api/mash/:twitter_handle1/:twitter_handle2', this.apiGetMashHandler );
+        this.app.get('/api/verify/:twitter_handle', this.apiGetVerifyHandler );
     }
 
     public config() {
@@ -44,24 +45,32 @@ export class Server {
     }
 
     /**
+     * Handles get requests to /api/verify
+     */
+
+    apiGetVerifyHandler = (req: express.Request, res: express.Response) => { 
+        let twitter_handle: string = '@'.concat(req.params['twitter_handle']);
+
+        let promise = this.twitter.verifyUserExists(twitter_handle);
+        promise.then((data) => {
+            res.send('');
+        })
+        promise.catch((error) => {
+            res.send(twitter_handle.concat(' does not exist'));
+        });
+    }
+
+    /**
      * Handles get requests to /api/mash
      */
     public apiGetMashHandler = (req: express.Request, res: express.Response) => { 
         let twitter_handle1: string = '@'.concat(req.params['twitter_handle1']);
         let twitter_handle2: string = '@'.concat(req.params['twitter_handle2']);
 
-        if(!this.twitter.verifyUserExists(twitter_handle1)) {
-            res.send(twitter_handle1.concat(' does not exist'));
-        }
-        else if(!this.twitter.verifyUserExists(twitter_handle2)) {
-            res.send(twitter_handle2.concat(' does not exist'));
-        }
-        else {
-            this.getCorpus(twitter_handle1, twitter_handle2, 1000).then(corpus => {
-                let sentenceGenerator = new NGramRandomSentence(corpus, { length: 4, stripPunctuation: true});
-                res.send(sentenceGenerator.getRandomSentence(50));
-            });
-        }
+        this.getCorpus(twitter_handle1, twitter_handle2, 1000).then(corpus => {
+            let sentenceGenerator = new NGramRandomSentence(corpus, { length: 4, stripPunctuation: true});
+            res.send(sentenceGenerator.getRandomSentence(50));
+        });
     }
 
     /**
