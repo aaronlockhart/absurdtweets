@@ -43,23 +43,15 @@ export class TwitterApp {
         return this.getLatestTweetsByCount(username, '1');
     }
 
-    verifyUserExists(username: string): any {
+    verifyUserExists(username: string): Promise<boolean> {
         
-        const promise = new Promise<string>((resolve, reject) => {
+        return new Promise<boolean>((resolve, reject) => {
             //this.twitter.getUser({screen_name: username},
             this.twitter.getCustomApiCall('/users/show.json', {screen_name: username},
-            (error, response, body) => reject(error),
-            (data) => resolve(data)
+            (error, response, body) => reject(false),
+            (data) => resolve(true)
             )
         });
-
-        promise.then((res) => {
-            return true;
-        })
-
-        promise.catch((err) => {
-            return false;
-        })
     }
 
     // This function will cache the max number of tweets allowed (3200) since the specified ID
@@ -85,7 +77,7 @@ export class TwitterApp {
             (data) => {
         
                 let tweets: string[] = new Array();
-                let i: number;
+                let i: number = 0;
                 let obj = JSON.parse(data) as [any];
 
                 for(let item of obj) {
