@@ -77,7 +77,7 @@ export class Server {
                         const flattened = [].concat.apply([], results);
                         resolve(flattened);
                     })
-                        .catch(reason => reject(reason));
+                    .catch(reason => reject(reason));
                 });
             }
         });
