@@ -11,6 +11,7 @@ export class MashTweetsComponent implements OnInit {
     twitter_user1: string;
     twitter_user2: string;
     tweet: string = '';
+    title = 'Mash them tweets!';
 
     constructor(private http: Http) { }
 
