@@ -14,12 +14,34 @@ export class TwitterApp {
                                     accessToken: this.accessToken, accessTokenSecret: this.accessSecret,
                                     callbackUrl: '' });
     }
+
     getLatestTweet(username: string): Promise<string[]> {
         return this.getLatestTweetsByCount(username, '1');
     }
 
+    verifyUserExists(username: string): any {
+        
+        const promise = new Promise<string>((resolve, reject) => {
+            //this.twitter.getUser({screen_name: username},
+            this.twitter.getCustomApiCall('/users/show.json', {screen_name: username},
+            (error, response, body) => reject(error),
+            (data) => resolve(data)
+            )
+        });
+
+        promise.then((res) => {
+            return true;
+        })
+
+        promise.catch((err) => {
+            return false;
+        })
+    }
+
     // We can only retrieve the latest 3200 tweets from the timeline
     getLatestTweetsByCount(username: string, count: string | number): Promise<string[]> {
+
+        //TO-DO: Need to add caching here
 
         return new Promise<string[]>((resolve, reject) => {
             this.twitter.getUserTimeline({screen_name: username, count: count},
