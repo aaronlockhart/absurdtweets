@@ -38,7 +38,7 @@ export class MashTweetsComponent implements OnInit {
         this.http.get('/api/verify/'.concat(user1)).subscribe((response) => {
             this.error = response.text();
         });
-        this.http.get('/api/verify/'.concat(user1)).subscribe((response) => {
+        this.http.get('/api/verify/'.concat(user2)).subscribe((response) => {
             this.error = this.error.concat(response.text());
         });
 
