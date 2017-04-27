@@ -96,8 +96,8 @@ export class Server {
             getData: () => {
                 return new Promise<string[]>((resolve, reject) => {
                     Promise.all([
-                        this.twitter.getLatestTweetsByCount(twitterHandle1, maxTweets),
-                        this.twitter.getLatestTweetsByCount(twitterHandle2, maxTweets)
+                        this.twitter.getTweets(twitterHandle1, maxTweets),
+                        this.twitter.getTweets(twitterHandle2, maxTweets)
                     ]).then(results => {
                         const flattened = [].concat.apply([], results);
                         resolve(flattened);

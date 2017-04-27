@@ -64,28 +64,26 @@ export class TwitterApp {
             let results: string[] = [];
             let remaining = count; 
             let nextCount = remaining >= TwitterApp.maxTweetsPerTimelineRequest ? TwitterApp.maxTweetsPerTimelineRequest : remaining; 
-            let lastPromise: Promise<Tweets> = this.getLatestTweetsByCount(username, nextCount);
-            remaining -= nextCount;
-
-            while (remaining > 0)
-            {
-                nextCount = remaining >= TwitterApp.maxTweetsPerTimelineRequest ? TwitterApp.maxTweetsPerTimelineRequest : remaining; 
-
-                lastPromise.then(tweets => {
-                    results = results.concat(tweets.text);
-                    lastPromise = this.getLatestTweetsByCount(username, nextCount, tweets.max_id);
-                })
-                .catch(reason => reject(reason));
-
-                remaining -= nextCount;
-            }
-
-            lastPromise.then(tweets => {
-                results = results.concat(tweets.text);
-                resolve(results);
-            })
-            .catch(reason => reject(reason));
+            let promises: Promise<void>[] = [];
+            let promise: Promise<Tweets> = this.getLatestTweetsByCount(username, nextCount);
+            this.getTweetsHelper(username, promise, results, nextCount, remaining, resolve);
         });
+    }
+
+    private getTweetsHelper(username: string, previousPromise: Promise<Tweets>, results: string[], nextCount: number, remaining: number, resolve: any)
+    {
+        previousPromise.then(tweets => {
+            results = results.concat(tweets.text);
+            remaining -= nextCount
+            nextCount = remaining >= TwitterApp.maxTweetsPerTimelineRequest ? TwitterApp.maxTweetsPerTimelineRequest : remaining;
+
+            if (remaining == 0) {
+                resolve(results);
+            }
+            else {
+                this.getTweetsHelper(username, this.getLatestTweetsByCount(username, nextCount, tweets.max_id), results, nextCount, remaining, resolve);
+            }
+        })
     }
 
     public verifyUserExists(username: string): Promise<boolean> {
@@ -162,27 +160,34 @@ export class TwitterApp {
 
 
     // We can only retrieve the latest 3200 tweets from the timeline
-    getLatestTweetsByCount(username: string, count: string | number, maxId?: number): Promise<Tweets> {
+    private getLatestTweetsByCount(username: string, count: string | number, maxId?: number): Promise<Tweets> {
         
         return new Promise<Tweets>((resolve, reject) => {
 
             this.twitter.getUserTimeline({screen_name: username, count: count, max_id: maxId},
             (error, response, body) => reject(error),
             (data) => {
-        
-                let tweets: string[] = new Array();
-                let obj = JSON.parse(data) as [{id: number, text: string}];
-                let max_id = 0;
-                for(let item of obj) {
-                    if (item.id > max_id) {
-                        max_id = item.id;
-                    }
+                try
+                {
+                    let tweets: string[] = new Array();
+                    let obj = JSON.parse(data) as [{id: number, text: string}];
+                    let max_id = obj[0].id;
+                    for(let item of obj) {
+                        if (item.id < max_id) {
+                            max_id = item.id;
+                        }
 
-                    let tweet = this.removeUselessThings(item.text);
-                    tweets.push(tweet);
-                    //console.log('Tweet [%s]', tweet);
+                        let tweet = this.removeUselessThings(item.text);
+                        tweets.push(tweet);
+                        //console.log('Tweet [%s]', tweet);
+                    }
+                    resolve({screen_name: username, max_id: max_id, text: tweets});
                 }
-                resolve({screen_name: username, max_id: max_id, text: tweets});
+                catch(e) {
+                    if (e instanceof Error) {
+                        reject(e.message);
+                    }
+                }
             })
         });
     }
