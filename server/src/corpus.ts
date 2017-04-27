@@ -20,6 +20,13 @@ export class Corpus {
     }
 
     private processRawData = (data: string[]) => {
-        this.data = data;
+
+        let newData: string[] = new Array();
+
+        data.forEach((element) => {
+            newData = newData.concat(element.toLowerCase().split('[.?!]'));
+        });
+
+        this.data = newData;
     }
 }

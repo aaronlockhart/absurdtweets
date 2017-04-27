@@ -11,6 +11,7 @@ export class MashTweetsComponent implements OnInit {
     twitter_user1: string;
     twitter_user2: string;
     tweet: string = '';
+    error: string = '';
     title = 'Mash them tweets!';
 
     constructor(private http: Http) { }
@@ -32,6 +33,14 @@ export class MashTweetsComponent implements OnInit {
         if(atIndex >= 0) {
           user2 = this.twitter_user2.replace('@', '');
         }
+
+        // Call the verify function to check if handles exist
+        this.http.get('/api/verify/'.concat(user1)).subscribe((response) => {
+            this.error = response.text();
+        });
+        this.http.get('/api/verify/'.concat(user2)).subscribe((response) => {
+            this.error = this.error.concat(response.text());
+        });
 
         // Call the function that takes the two handles and generates the mash
         this.http.get('/api/mash/'.concat(user1.concat('/'.concat(user2)))).subscribe((response) => {

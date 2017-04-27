@@ -91,10 +91,9 @@ export class TwitterApp {
     public verifyUserExists(username: string): Promise<boolean> {
         
         return new Promise<boolean>((resolve, reject) => {
-            //this.twitter.getUser({screen_name: username},
-            this.twitter.getCustomApiCall('/users/show.json', {screen_name: username},
-            (error, response, body) => reject(false),
-            (data) => resolve(true)
+            this.twitter.getUser({screen_name: username},
+            (error, response, body) => reject(error),
+            (data) => resolve(data)
             )
         });
     }
