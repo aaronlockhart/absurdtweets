@@ -70,6 +70,8 @@ export class Server {
         });
     }
 
+    //private generator: Map<string, NGramRandomSentence> = new Map<string, NGramRandomSentence>();
+
     /**
      * Handles get requests to /api/mash
      */
@@ -79,7 +81,7 @@ export class Server {
 
         this.getCorpus(twitter_handle1, twitter_handle2, 1000)
         .then(corpus => {
-            let sentenceGenerator = new NGramRandomSentence(corpus, { length: 4, stripPunctuation: true});
+            let sentenceGenerator = new NGramRandomSentence(corpus, { length: 3, stripPunctuation: true});
             res.send(sentenceGenerator.getRandomSentence(50));
         })
         .catch(reason => res.send(reason));
