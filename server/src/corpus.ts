@@ -20,14 +20,18 @@ export class Corpus {
     }
 
     private processRawData = (data: string[]) => {
-
-        let newData: string[] = new Array();
-
-        data.forEach((element) => {
-
-            newData = newData.concat(element.toLowerCase().replace(/([.?!])\s*(?=[A-Z])/g, "$1|").split("|"));
-        });
-
-        this.data = newData;
+        let regex = new RegExp(/[^\\.\\?\\!]+[\\.\\!\\?]/g);
+        let results: string[] = [];
+        for (let sentence of data) {
+            let broken = sentence.match(regex);
+            if (broken) { 
+                let trimmed = broken.map(value => value.trim());
+                results = results.concat(trimmed);
+            }
+            else {
+                results.push(sentence);
+            }
+        }
+        this.data = results;
     }
 }
