@@ -45,16 +45,19 @@ export class Server {
         });
     }
 
+    /**
+     * Handles get requests to /api/tweets/:twitter_handle/:count
+     */
     public apiGetTweetsHandler = (req: express.Request, res: express.Response) => {
         let user = req.params['twitter_handle'];
         let count = req.params['count'];
         this.twitter.getTweets(user, count)
         .then(tweets => res.send(tweets));
     }
+
     /**
      * Handles get requests to /api/verify
      */
-
     apiGetVerifyHandler = (req: express.Request, res: express.Response) => { 
         let twitter_handle: string = '@'.concat(req.params['twitter_handle']);
 
@@ -74,10 +77,12 @@ export class Server {
         let twitter_handle1: string = '@'.concat(req.params['twitter_handle1']);
         let twitter_handle2: string = '@'.concat(req.params['twitter_handle2']);
 
-        this.getCorpus(twitter_handle1, twitter_handle2, 1000).then(corpus => {
+        this.getCorpus(twitter_handle1, twitter_handle2, 1000)
+        .then(corpus => {
             let sentenceGenerator = new NGramRandomSentence(corpus, { length: 4, stripPunctuation: true});
             res.send(sentenceGenerator.getRandomSentence(50));
-        });
+        })
+        .catch(reason => res.send(reason));
     }
 
     /**
@@ -86,8 +91,19 @@ export class Server {
     public apiGetCorpusHandler = (req: express.Request, res: express.Response) => {
         let twitter_handle1: string = '@'.concat(req.params['twitter_handle1']);
         let twitter_handle2: string = '@'.concat(req.params['twitter_handle2']);
+        let pretty: boolean = req.query.pretty == 'true';
         let max_tweets: number = req.params['max_tweets'];
-        this.getCorpus(twitter_handle1, twitter_handle2, max_tweets).then(corpus => res.send(corpus.data));
+        this.getCorpus(twitter_handle1, twitter_handle2, max_tweets)
+        .then(corpus => {
+            if (pretty == true) {
+                let prettified = corpus.data.join('</br>')
+                res.send(prettified);
+            }
+            else {
+                res.json(corpus.data);
+            } 
+        })
+        .catch(reason => res.send(reason));
     }
 
     private getCorpus(twitterHandle1: string, twitterHandle2: string, maxTweets?: number): Promise<Corpus> {
