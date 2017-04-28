@@ -79,7 +79,7 @@ export class Server {
         let twitter_handle1: string = '@'.concat(req.params['twitter_handle1']);
         let twitter_handle2: string = '@'.concat(req.params['twitter_handle2']);
 
-        this.getCorpus(twitter_handle1, twitter_handle2, 1000)
+        this.getCorpus(twitter_handle1, twitter_handle2, 3200)
         .then(corpus => {
             let sentenceGenerator = new NGramRandomSentence(corpus, { length: 3, stripPunctuation: true});
             res.send(sentenceGenerator.getRandomSentence(50));
