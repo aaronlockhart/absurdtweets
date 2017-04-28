@@ -28,32 +28,19 @@ export class Corpus {
 
         let lowerCase: string = '';
         let newData: string[] = new Array();
+        let foundPeriod: boolean = false;
+        let foundExclamation: boolean = false;
+        let foundQuestion: boolean = false;
 
         data.forEach((element) => {
 
-            brokenTweetByPeriod = new Array();
-            brokenTweetByExclamation = new Array();
-            brokenTweetByQuestion = new Array();
-
-            lowerCase = element.toLowerCase();
-            brokenTweetByPeriod = lowerCase.split('.');
-            
-            brokenTweetByPeriod.forEach((item) => {
-                tempSentence = item.concat('.');
-                brokenTweetByExclamation = brokenTweetByExclamation.concat(tempSentence.split('!'));
-            });
-
-            brokenTweetByExclamation.forEach((item) => {
-                tempSentence = item.concat('!');
-                brokenTweetByQuestion = brokenTweetByQuestion.concat(tempSentence.split('?'));
-            });
-
-            brokenTweetByQuestion.forEach((item) => {
-                tempSentence = item.concat('?');
-                newData = newData.concat(tempSentence);
-            });
+            newData = newData.concat(element.toLowerCase().replace(/([.?!])\s*(?=[A-Z])/g, "$1|").split("|"));
         });
 
         this.data = newData;
+    }
+
+    private breakByPeriod(input: string): string[] {
+        return ;
     }
 }
