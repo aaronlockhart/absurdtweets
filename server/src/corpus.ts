@@ -25,7 +25,7 @@ export class Corpus {
         for (let sentence of data) {
             let broken = sentence.match(regex);
             if (broken) { 
-                let trimmed = broken.map(value => value.trim());
+                let trimmed = broken.map(value => value.trim().toLowerCase());
                 results = results.concat(trimmed);
             }
             else {
