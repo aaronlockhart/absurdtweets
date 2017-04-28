@@ -1,18 +1,21 @@
 <h1>
   {{title}}
 </h1>
-<div>
-    <div>
-        @ <input [(ngModel)]="twitter_user1" placeholder="first twitter handle"/>   <font size="+2"> & </font>  
-        @ <input [(ngModel)]="twitter_user2" placeholder="second twitter handle"/>
+<div class=row></div>
+<div class=row>
+    <div align=center>
+        @ <input class=left [(ngModel)]="twitter_user1" placeholder="first twitter handle"/>  
+        @ <input class=right [(ngModel)]="twitter_user2" placeholder="second twitter handle"/>
     </div>
-    <button (click)="mash()">Mash them up!</button>
-    <br />
-    <br />
     <div>
+    </div>
+    <div class=row>
+      <button (click)="mash()">Mash them up!</button>
+    </div>
+    <div class=tweet>
         {{tweet}}
     </div>
-    <div>
+    <div class=error>
         {{error}}
     </div>
 </div>
