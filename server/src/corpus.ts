@@ -21,16 +21,7 @@ export class Corpus {
 
     private processRawData = (data: string[]) => {
 
-        let brokenTweetByPeriod: string[] = new Array();
-        let brokenTweetByExclamation: string[] = new Array();
-        let brokenTweetByQuestion: string[] = new Array();
-        let tempSentence: string = '';
-
-        let lowerCase: string = '';
         let newData: string[] = new Array();
-        let foundPeriod: boolean = false;
-        let foundExclamation: boolean = false;
-        let foundQuestion: boolean = false;
 
         data.forEach((element) => {
 
