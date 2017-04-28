@@ -106,14 +106,21 @@ export class Server {
         .catch(reason => res.send(reason));
     }
 
+    private corpusCache: Map<string, string[]> = new Map<string, string[]>();
+
     private getCorpus(twitterHandle1: string, twitterHandle2: string, maxTweets?: number): Promise<Corpus> {
         maxTweets = maxTweets || 10;
         return Corpus.create({
             getData: () => {
                 return new Promise<string[]>((resolve, reject) => {
+                    let user1Data = this.corpusCache.get(twitterHandle1) || this.twitter.getTweets(twitterHandle1, maxTweets)
+                                                                                         .then(results => { this.corpusCache.set(twitterHandle1, results); return results});
+                    let user2Data = this.corpusCache.get(twitterHandle2) || this.twitter.getTweets(twitterHandle2, maxTweets)
+                                                                                         .then(results => { this.corpusCache.set(twitterHandle2, results); return results});
+
                     Promise.all([
-                        this.twitter.getTweets(twitterHandle1, maxTweets),
-                        this.twitter.getTweets(twitterHandle2, maxTweets)
+                        user1Data,
+                        user2Data
                     ]).then(results => {
                         const flattened = [].concat.apply([], results);
                         resolve(flattened);
