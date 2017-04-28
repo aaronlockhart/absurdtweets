@@ -39,8 +39,4 @@ export class Corpus {
 
         this.data = newData;
     }
-
-    private breakByPeriod(input: string): string[] {
-        return ;
-    }
 }
